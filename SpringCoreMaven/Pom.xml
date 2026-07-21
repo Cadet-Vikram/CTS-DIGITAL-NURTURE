@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Exercise 4: Creating and Configuring a Maven Project
+    ─────────────────────────────────────────────────────
+    This pom.xml satisfies Exercise 4 requirements:
+    • Spring Context, Spring AOP, Spring WebMVC dependencies
+    • Maven Compiler Plugin configured for Java 1.8 (as per exercise spec)
+
+    The same project also covers:
+    • Exercise 1 – Basic Spring Application (spring-context)
+    • Exercise 2 – Dependency Injection     (spring-context)
+    • Exercise 5 – Spring IoC Container     (spring-context)
+    • Exercise 7 – Constructor/Setter DI    (spring-context)
+    • Exercise 3 & 8 – Spring AOP           (spring-aop + aspectjweaver)
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.library</groupId>
+    <artifactId>LibraryManagement</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>Library Management – Spring Core and Maven</name>
+
+    <properties>
+        <!-- Exercise 4 specifies Java 1.8 -->
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.version>5.3.30</spring.version>
+        <aspectj.version>1.9.20.1</aspectj.version>
+    </properties>
+
+    <dependencies>
+
+        <!-- ── Exercise 4: Spring Context (pulls in Core + Beans) ── -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <!-- ── Exercise 4: Spring AOP ──────────────────────────── -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <!-- AspectJ weaver: required for @Aspect, @Before, @After, @Around -->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj.version}</version>
+        </dependency>
+
+        <!-- ── Exercise 4: Spring WebMVC ───────────────────────── -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+
+            <!-- ── Exercise 4: Maven Compiler Plugin for Java 1.8 ── -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
