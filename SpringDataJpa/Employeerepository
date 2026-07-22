@@ -1,0 +1,82 @@
+package com.cognizant.ormlearn.repository;
+
+import com.cognizant.ormlearn.model.Employee;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+/**
+ * EmployeeRepository – demonstrates HQL and Native Query.
+ *
+ * Hands-on 2 (doc 3): HQL (Hibernate Query Language)
+ *   • Object-oriented query language similar to SQL
+ *   • Refers to entity class names and field names (not table/column names)
+ *   • @Query annotation with value = HQL string
+ *
+ * Hands-on 4 (doc 3): HQL aggregate function AVG()
+ *   • @Param("id") binds method parameter to named :id placeholder
+ *
+ * Hands-on 5 (doc 3): Native Query
+ *   • nativeQuery = true makes @Query accept raw SQL (not HQL)
+ *   • Useful for DB-specific features; avoid where possible for portability
+ */
+@Repository
+public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
+
+    // ── Hands-on 2 (doc 3): HQL – Get all permanent employees ───────────────
+
+    /**
+     * Basic HQL: SELECT all permanent employees.
+     *
+     * 'Employee' = Java class name (not table name)
+     * 'e.permanent' = Java field name (not column name em_permanent)
+     *
+     * Optimized with LEFT JOIN FETCH so department and skill list
+     * are loaded in ONE SQL query instead of N+1 separate queries.
+     * (explained in doc 3 – "Optimizing HQL Solution by using 'fetch'")
+     */
+    @Query("SELECT DISTINCT e FROM Employee e " +
+           "LEFT JOIN FETCH e.department " +
+           "LEFT JOIN FETCH e.skillList " +
+           "WHERE e.permanent = true")
+    List<Employee> getAllPermanentEmployees();
+
+    // ── Hands-on 4 (doc 3): HQL – Aggregate function AVG ────────────────────
+
+    /**
+     * Compute average salary across ALL employees.
+     * HQL aggregate AVG() maps directly to SQL AVG().
+     */
+    @Query("SELECT AVG(e.salary) FROM Employee e")
+    double getAverageSalary();
+
+    /**
+     * Compute average salary for a SPECIFIC department.
+     *
+     * :id is a named parameter — bound to the @Param("id") int argument.
+     * 'e.department.id' navigates from Employee → Department → id field.
+     */
+    @Query("SELECT AVG(e.salary) FROM Employee e WHERE e.department.id = :id")
+    double getAverageSalaryByDepartment(@Param("id") int departmentId);
+
+    // ── Hands-on 5 (doc 3): Native Query ────────────────────────────────────
+
+    /**
+     * Native SQL query — uses actual table/column names.
+     * nativeQuery = true tells Spring Data to execute this as raw SQL.
+     *
+     * Use native queries sparingly — they break database portability.
+     * HQL / JPQL is preferred for standard operations.
+     */
+    @Query(value = "SELECT * FROM employee", nativeQuery = true)
+    List<Employee> getAllEmployeesNative();
+
+    /**
+     * Native query with a WHERE filter — get employees by department ID.
+     */
+    @Query(value = "SELECT * FROM employee WHERE em_dp_id = :deptId", nativeQuery = true)
+    List<Employee> getEmployeesByDepartmentNative(@Param("deptId") int departmentId);
+}
