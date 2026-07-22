@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Microservice 4: api-gateway
+    ─────────────────────────────────────────────────────────────
+    doc2: Create Spring Cloud API Gateway.
+
+    Runs on port 9090.
+    Uses Eureka service discovery to route requests to registered microservices.
+    Includes a GlobalFilter (LogFilter) that logs every incoming request.
+
+    Key: Spring Cloud Gateway uses WebFlux (reactive), NOT Spring MVC.
+    Do NOT add spring-boot-starter-web — it conflicts with Gateway.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.0</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.cognizant</groupId>
+    <artifactId>api-gateway</artifactId>
+    <version>1.0.0</version>
+    <name>api-gateway</name>
+    <description>API Gateway – routes requests to microservices via Eureka discovery</description>
+
+    <properties>
+        <java.version>17</java.version>
+        <spring-cloud.version>2023.0.0</spring-cloud.version>
+    </properties>
+
+    <dependencies>
+        <!-- Spring Cloud Gateway – reactive API gateway (uses WebFlux internally) -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+
+        <!-- Eureka Client – discovers registered microservices for load-balanced routing -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Actuator – /actuator/health, /actuator/gateway/routes -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- DevTools -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
