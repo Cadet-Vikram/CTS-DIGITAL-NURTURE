@@ -1,0 +1,279 @@
+package com.cognizant.ormlearn;
+
+import com.cognizant.ormlearn.model.Country;
+import com.cognizant.ormlearn.model.Department;
+import com.cognizant.ormlearn.model.Employee;
+import com.cognizant.ormlearn.model.Skill;
+import com.cognizant.ormlearn.service.*;
+import com.cognizant.ormlearn.service.exception.CountryNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+import java.util.Date;
+import java.util.List;
+
+/**
+ * OrmLearnApplication – Spring Boot main class for all JPA exercises.
+ *
+ * Each static test method corresponds to one hands-on exercise.
+ * Comment/uncomment method calls in main() to run specific exercises.
+ *
+ * Exercises covered:
+ *   testGetAllCountries()          – doc1 HOL1 MANDATORY  (Quick Example)
+ *   testFindCountryByCode()        – doc1 HOL6 Additional
+ *   testAddCountry()               – doc1 HOL7 Additional
+ *   testUpdateCountry()            – doc1 HOL8 Additional
+ *   testDeleteCountry()            – doc1 HOL9 Additional
+ *   testCountrySearch()            – doc2 HOL1 Additional (Query Methods)
+ *   testGetEmployee()              – doc2 HOL4 Additional (ManyToOne)
+ *   testAddEmployee()              – doc2 HOL4 Additional
+ *   testGetDepartment()            – doc2 HOL5 Additional (OneToMany)
+ *   testGetAllPermanentEmployees() – doc3 HOL2 Additional (HQL)
+ *   testGetAverageSalary()         – doc3 HOL4 Additional (HQL aggregate)
+ *   testGetAllEmployeesNative()    – doc3 HOL5 Additional (Native Query)
+ */
+@SpringBootApplication
+public class OrmLearnApplication {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrmLearnApplication.class);
+
+    // ── Static service references (set from ApplicationContext in main) ───────
+    private static CountryService    countryService;
+    private static EmployeeService   employeeService;
+    private static DepartmentService departmentService;
+    private static SkillService      skillService;
+
+    public static void main(String[] args) {
+        ApplicationContext context = SpringApplication.run(OrmLearnApplication.class, args);
+        LOGGER.info("Inside main – Spring context loaded");
+
+        // Fetch service beans from the context
+        countryService    = context.getBean(CountryService.class);
+        employeeService   = context.getBean(EmployeeService.class);
+        departmentService = context.getBean(DepartmentService.class);
+        skillService      = context.getBean(SkillService.class);
+
+        // ── Run exercise test methods ──────────────────────────────────────
+        // Comment / uncomment to run individual exercises
+
+        // doc1 HOL1 MANDATORY: Quick Example
+        testGetAllCountries();
+
+        // doc1 HOL6 Additional: Find by code
+        testFindCountryByCode();
+
+        // doc1 HOL7 Additional: Add country
+        testAddCountry();
+
+        // doc1 HOL8 Additional: Update country
+        testUpdateCountry();
+
+        // doc1 HOL9 Additional: Delete country
+        testDeleteCountry();
+
+        // doc2 HOL1 Additional: Query Methods
+        testCountrySearch();
+
+        // doc2 HOL4 Additional: ManyToOne – get employee with department
+        testGetEmployee();
+
+        // doc2 HOL4 Additional: Add a new employee with department
+        testAddEmployee();
+
+        // doc2 HOL5 Additional: OneToMany – get department with employees
+        testGetDepartment();
+
+        // doc3 HOL2 Additional: HQL – permanent employees with skills
+        testGetAllPermanentEmployees();
+
+        // doc3 HOL4 Additional: HQL aggregate – average salary
+        testGetAverageSalary();
+
+        // doc3 HOL5 Additional: Native SQL query
+        testGetAllEmployeesNative();
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // doc1 HOL1 MANDATORY: Spring Data JPA – Quick Example
+    // ════════════════════════════════════════════════════════════════
+
+    private static void testGetAllCountries() {
+        LOGGER.info("═══ testGetAllCountries START ═══");
+        List<Country> countries = countryService.getAllCountries();
+        LOGGER.debug("Total countries fetched: {}", countries.size());
+        countries.forEach(c -> LOGGER.debug("  {}", c));
+        LOGGER.info("═══ testGetAllCountries END ═══\n");
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // doc1 HOL6 Additional: Find a country based on country code
+    // ════════════════════════════════════════════════════════════════
+
+    private static void testFindCountryByCode() {
+        LOGGER.info("═══ testFindCountryByCode START ═══");
+        try {
+            Country country = countryService.findCountryByCode("IN");
+            LOGGER.debug("Found: {}", country);
+
+            // Test exception path with an invalid code
+            countryService.findCountryByCode("XX");
+        } catch (CountryNotFoundException e) {
+            LOGGER.warn("Expected exception: {}", e.getMessage());
+        }
+        LOGGER.info("═══ testFindCountryByCode END ═══\n");
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // doc1 HOL7 Additional: Add a new country
+    // ════════════════════════════════════════════════════════════════
+
+    private static void testAddCountry() {
+        LOGGER.info("═══ testAddCountry START ═══");
+        Country newCountry = new Country("TN", "Tamil Nadu Demo");
+        countryService.addCountry(newCountry);
+
+        // Verify by fetching it back
+        Country fetched = countryService.findCountryByCode("TN");
+        LOGGER.debug("Verified added country: {}", fetched);
+        LOGGER.info("═══ testAddCountry END ═══\n");
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // doc1 HOL8 Additional: Update a country
+    // ════════════════════════════════════════════════════════════════
+
+    private static void testUpdateCountry() {
+        LOGGER.info("═══ testUpdateCountry START ═══");
+        countryService.updateCountry("TN", "Tamil Nadu (Updated)");
+
+        Country updated = countryService.findCountryByCode("TN");
+        LOGGER.debug("After update: {}", updated);
+        LOGGER.info("═══ testUpdateCountry END ═══\n");
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // doc1 HOL9 Additional: Delete a country
+    // ════════════════════════════════════════════════════════════════
+
+    private static void testDeleteCountry() {
+        LOGGER.info("═══ testDeleteCountry START ═══");
+        countryService.deleteCountry("TN");
+
+        try {
+            countryService.findCountryByCode("TN");   // should throw
+        } catch (CountryNotFoundException e) {
+            LOGGER.debug("Confirmed deleted – {}", e.getMessage());
+        }
+        LOGGER.info("═══ testDeleteCountry END ═══\n");
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // doc2 HOL1 Additional: Query Methods on country table
+    // ════════════════════════════════════════════════════════════════
+
+    private static void testCountrySearch() {
+        LOGGER.info("═══ testCountrySearch START ═══");
+
+        // Search containing "ou" (unordered)
+        LOGGER.debug("Countries containing 'ou':");
+        countryService.searchByName("ou")
+                .forEach(c -> LOGGER.debug("  {}", c));
+
+        // Same but sorted by name
+        LOGGER.debug("Countries containing 'ou' (sorted):");
+        countryService.searchByNameSorted("ou")
+                .forEach(c -> LOGGER.debug("  {}", c));
+
+        // Countries starting with "Z"
+        LOGGER.debug("Countries starting with 'Z':");
+        countryService.searchByPrefix("Z")
+                .forEach(c -> LOGGER.debug("  {}", c));
+
+        LOGGER.info("═══ testCountrySearch END ═══\n");
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // doc2 HOL4 Additional: ManyToOne – Employee with Department
+    // ════════════════════════════════════════════════════════════════
+
+    private static void testGetEmployee() {
+        LOGGER.info("═══ testGetEmployee START ═══");
+        Employee employee = employeeService.get(1);
+        LOGGER.debug("Employee: {}", employee);
+        LOGGER.debug("Department: {}", employee.getDepartment());
+        LOGGER.debug("Skills: {}", employee.getSkillList());
+        LOGGER.info("═══ testGetEmployee END ═══\n");
+    }
+
+    private static void testAddEmployee() {
+        LOGGER.info("═══ testAddEmployee START ═══");
+
+        // Get a department to associate with the new employee
+        Department dept = departmentService.get(1);   // Engineering
+
+        Employee newEmp = new Employee();
+        newEmp.setName("Frank Miller");
+        newEmp.setSalary(72000.00);
+        newEmp.setPermanent(true);
+        newEmp.setDateOfBirth(new Date()); // demo: today
+        newEmp.setDepartment(dept);
+
+        employeeService.save(newEmp);
+        LOGGER.debug("New employee saved: {}", newEmp);
+        LOGGER.info("═══ testAddEmployee END ═══\n");
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // doc2 HOL5 Additional: OneToMany – Department with Employees
+    // ════════════════════════════════════════════════════════════════
+
+    private static void testGetDepartment() {
+        LOGGER.info("═══ testGetDepartment START ═══");
+        Department dept = departmentService.get(1);   // Engineering
+        LOGGER.debug("Department: {}", dept);
+        LOGGER.debug("Employees in department:");
+        dept.getEmployeeList().forEach(e -> LOGGER.debug("  {}", e));
+        LOGGER.info("═══ testGetDepartment END ═══\n");
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // doc3 HOL2 Additional: HQL – Get all permanent employees
+    // ════════════════════════════════════════════════════════════════
+
+    private static void testGetAllPermanentEmployees() {
+        LOGGER.info("═══ testGetAllPermanentEmployees START ═══");
+        List<Employee> employees = employeeService.getAllPermanentEmployees();
+        LOGGER.debug("Permanent employees: {}", employees);
+        employees.forEach(e -> LOGGER.debug("  Skills: {}", e.getSkillList()));
+        LOGGER.info("═══ testGetAllPermanentEmployees END ═══\n");
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // doc3 HOL4 Additional: HQL aggregate – Average salary
+    // ════════════════════════════════════════════════════════════════
+
+    private static void testGetAverageSalary() {
+        LOGGER.info("═══ testGetAverageSalary START ═══");
+        double overall = employeeService.getAverageSalary();
+        LOGGER.debug("Overall average salary: {}", overall);
+
+        double engAvg = employeeService.getAverageSalaryByDepartment(1);
+        LOGGER.debug("Engineering dept average salary: {}", engAvg);
+        LOGGER.info("═══ testGetAverageSalary END ═══\n");
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // doc3 HOL5 Additional: Native SQL query
+    // ════════════════════════════════════════════════════════════════
+
+    private static void testGetAllEmployeesNative() {
+        LOGGER.info("═══ testGetAllEmployeesNative START ═══");
+        List<Employee> employees = employeeService.getAllEmployeesNative();
+        LOGGER.debug("All employees (native SQL): {}", employees.size());
+        employees.forEach(e -> LOGGER.debug("  {}", e));
+        LOGGER.info("═══ testGetAllEmployeesNative END ═══\n");
+    }
+}
