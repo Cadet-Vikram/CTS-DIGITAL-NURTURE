@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    country.xml – doc1 HOL4/5/6 + doc2 Country REST Service
+
+    Demonstrates:
+    HOL4: Defining a single Country bean with setter injection
+    HOL5: scope="prototype" – new instance on every getBean() call
+    HOL6: ArrayList of Country beans loaded by CountryService / REST
+
+    <property name="code" value="IN" />  → calls country.setCode("IN")
+    <ref bean="in" />                    → injects the bean with id="in"
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Individual country beans (HOL6) -->
+    <bean id="in" class="com.cognizant.springlearn.Country">
+        <property name="code" value="IN" />
+        <property name="name" value="India" />
+    </bean>
+
+    <bean id="us" class="com.cognizant.springlearn.Country">
+        <property name="code" value="US" />
+        <property name="name" value="United States" />
+    </bean>
+
+    <bean id="de" class="com.cognizant.springlearn.Country">
+        <property name="code" value="DE" />
+        <property name="name" value="Germany" />
+    </bean>
+
+    <bean id="jp" class="com.cognizant.springlearn.Country">
+        <property name="code" value="JP" />
+        <property name="name" value="Japan" />
+    </bean>
+
+    <!--
+        HOL4 & HOL5: Single country bean used by displayCountry() in main class.
+        scope="prototype" – constructor is called for EACH getBean() call (HOL5 demo).
+        scope="singleton" (default) – constructor called only ONCE.
+    -->
+    <bean id="country" class="com.cognizant.springlearn.Country" scope="prototype">
+        <property name="code" value="IN" />
+        <property name="name" value="India" />
+    </bean>
+
+    <!--
+        HOL6 + doc2 REST: ArrayList of all 4 countries.
+        CountryService and CountryController load this list.
+        <list> and <ref> demonstrate XML-based collection injection.
+    -->
+    <bean id="countryList" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <ref bean="in"/>
+                <ref bean="us"/>
+                <ref bean="de"/>
+                <ref bean="jp"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+</beans>
