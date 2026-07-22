@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    hello.xml – HOL 4: Merge Conflict Resolution
+    This file demonstrates what a CONFLICT looks like in Git.
+    
+    When Git cannot auto-merge, it inserts these markers:
+    
+    <<<<<<< HEAD        → your current branch (master/main)
+    ...current content...
+    =======             → separator
+    ...incoming content...
+    >>>>>>> GitWork     → the branch being merged
+    
+    You MUST:
+    1. Delete all three marker lines (<<<<<<<, =======, >>>>>>>)
+    2. Keep/edit the content you want
+    3. git add the file
+    4. git commit
+-->
+
+<!-- ── Example of what Git puts in the conflicted file ── -->
+<!--
+<<<<<<< HEAD
+<greeting>
+    <message>Hello from Master Branch</message>
+    <author>Tech Team</author>
+    <version>Master Version</version>
+</greeting>
+=======
+<greeting>
+    <message>Hello from GitWork Branch</message>
+    <author>Abhirami S</author>
+    <version>Branch Version</version>
+</greeting>
+>>>>>>> GitWork
+-->
+
+<!-- ── RESOLVED version (what you commit after resolving) ── -->
+<greeting>
+    <message>Hello from Both Branches – Conflict Resolved</message>
+    <author>Abhirami S</author>
+    <fromMaster>Master Branch Greeting</fromMaster>
+    <fromBranch>GitWork Branch Greeting</fromBranch>
+    <version>Merged Version</version>
+</greeting>

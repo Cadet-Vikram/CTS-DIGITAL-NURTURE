@@ -1,0 +1,6 @@
+Welcome to GitDemo – Cognizant DN 5.0
+This file was added to the Git repository as part of HOL 1.
+
+Author : Abhirami S
+Module : Version Control – GIT
+Date   : 2026
